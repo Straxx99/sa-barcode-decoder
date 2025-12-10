@@ -159,3 +159,4 @@ This API is specifically designed for:
 
 MIT License - Free for personal and commercial use
 "# sa-barcode-decoder" 
+"# sa-barcode-decoder" 
