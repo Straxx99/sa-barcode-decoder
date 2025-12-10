@@ -21,9 +21,13 @@ RUN pip install --no-cache-dir gunicorn
 # Copy application files
 COPY app_sa.py .
 COPY sa_license_decoder.py .
+COPY start.sh .
+
+# Make start script executable
+RUN chmod +x start.sh
 
 # Expose port
 EXPOSE 5000
 
-# Run with gunicorn (use PORT env var for Railway)
-CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 120 app_sa:app
+# Run with start script
+CMD ["./start.sh"]
