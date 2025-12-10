@@ -25,5 +25,5 @@ COPY sa_license_decoder.py .
 # Expose port
 EXPOSE 5000
 
-# Run with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120", "app_sa:app"]
+# Run with gunicorn (use PORT env var for Railway)
+CMD gunicorn --bind 0.0.0.0:${PORT:-5000} --workers 2 --timeout 120 app_sa:app
