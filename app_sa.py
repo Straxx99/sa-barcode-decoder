@@ -45,6 +45,12 @@ def health():
     })
 
 
+@app.route('/favicon.ico')
+def favicon():
+    """Return empty response for favicon to prevent 404 errors"""
+    return '', 204
+
+
 def try_decode_with_preprocessing(original_image):
     """
     Try decoding with different preprocessing methods
