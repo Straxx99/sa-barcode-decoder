@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SA Document Decoder - LIVE DEMO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #e9ecef;
+        }
+
+        .upload-area.dragover {
+            border-color: #10b981;
+            background: #d1fae5;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .result-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .result-body {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-label {
+            color: #6b7280;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #1f2937;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #dc2626;
+            display: none;
+        }
+
+        .success-icon {
+            color: #10b981;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 SA Document Decoder</h1>
+            <p>In-House PDF417 Barcode Solution</p>
+            <div class="status-badge">✓ LIVE & WORKING</div>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 20px; color: #1f2937;">Upload SA Vehicle License Disc or Driver's License</h2>
+
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📄</div>
+                <h3 style="color: #667eea; margin-bottom: 10px;">Click to upload or drag & drop</h3>
+                <p style="color: #6b7280;">Supported: JPG, PNG (Vehicle disc back or Driver's license back)</p>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" id="decodeBtn" disabled>Decode Barcode</button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="color: #6b7280; font-size: 1.1em;">Decoding barcode... This may take a few seconds</p>
+            </div>
+
+            <div class="error" id="error"></div>
+
+            <div class="result-section" id="resultSection">
+                <div class="result-header">
+                    <div class="success-icon">✓</div>
+                    Barcode Decoded Successfully!
+                </div>
+                <div class="result-body">
+                    <div id="resultContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="background: #1f2937; color: white;">
+            <h3 style="margin-bottom: 15px;">System Status</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div>
+                    <div style="opacity: 0.7; margin-bottom: 5px;">API Status</div>
+                    <div style="font-size: 1.2em; font-weight: bold;" id="apiStatus">Checking...</div>
+                </div>
+                <div>
+                    <div style="opacity: 0.7; margin-bottom: 5px;">Decoder</div>
+                    <div style="font-size: 1.2em; font-weight: bold;">pdf417decoder + RSA</div>
+                </div>
+                <div>
+                    <div style="opacity: 0.7; margin-bottom: 5px;">Encryption Support</div>
+                    <div style="font-size: 1.2em; font-weight: bold;">✓ Enabled</div>
+                </div>
+                <div>
+                    <div style="opacity: 0.7; margin-bottom: 5px;">Cost</div>
+                    <div style="font-size: 1.2em; font-weight: bold; color: #10b981;">$0/month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let selectedFile = null;
+
+        // Check API status
+        fetch(`${API_URL}/health`)
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('apiStatus').textContent = '✓ Online';
+                document.getElementById('apiStatus').style.color = '#10b981';
+            })
+            .catch(e => {
+                document.getElementById('apiStatus').textContent = '✗ Offline';
+                document.getElementById('apiStatus').style.color = '#ef4444';
+            });
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const decodeBtn = document.getElementById('decodeBtn');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                uploadArea.innerHTML = `
+                    <div class="upload-icon">✓</div>
+                    <h3 style="color: #10b981;">File selected: ${selectedFile.name}</h3>
+                    <p style="color: #6b7280;">Click "Decode Barcode" to process</p>
+                `;
+                decodeBtn.disabled = false;
+            }
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                selectedFile = e.dataTransfer.files[0];
+                fileInput.files = e.dataTransfer.files;
+                uploadArea.innerHTML = `
+                    <div class="upload-icon">✓</div>
+                    <h3 style="color: #10b981;">File selected: ${selectedFile.name}</h3>
+                    <p style="color: #6b7280;">Click "Decode Barcode" to process</p>
+                `;
+                decodeBtn.disabled = false;
+            }
+        });
+
+        // Decode button
+        decodeBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'none';
+            decodeBtn.disabled = true;
+
+            try {
+                // Read file as base64
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const base64Image = e.target.result;
+
+                    // Send to API
+                    const response = await fetch(`${API_URL}/decode`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ image: base64Image })
+                    });
+
+                    const result = await response.json();
+
+                    // Hide loading
+                    document.getElementById('loading').style.display = 'none';
+                    decodeBtn.disabled = false;
+
+                    if (result.success) {
+                        displayResult(result);
+                    } else {
+                        showError(result.error || 'Failed to decode barcode');
+                    }
+                };
+                reader.readAsDataURL(selectedFile);
+
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                decodeBtn.disabled = false;
+                showError('Connection error: ' + error.message);
+            }
+        });
+
+        function displayResult(result) {
+            const resultContent = document.getElementById('resultContent');
+            let html = '';
+
+            if (result.license_type === 'SA_VEHICLE_DISC') {
+                html = `
+                    <h3 style="color: #1f2937; margin-bottom: 20px;">🚙 SA Vehicle License Disc</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Make</div>
+                            <div class="info-value">${result.make || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Model</div>
+                            <div class="info-value">${result.model || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Registration Number</div>
+                            <div class="info-value">${result.register_number || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">VIN</div>
+                            <div class="info-value">${result.vin || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Color</div>
+                            <div class="info-value">${result.color || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Engine Number</div>
+                            <div class="info-value">${result.engine_number || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Control Number</div>
+                            <div class="info-value">${result.control_number || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">License Number</div>
+                            <div class="info-value">${result.license_number || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px;">
+                        <div class="info-label">Description</div>
+                        <div class="info-value">${result.description || 'N/A'}</div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 10px; background: #e0e7ff; border-radius: 8px; text-align: center;">
+                        <small>Preprocessing: ${result.preprocessing_used || 'N/A'} | Format: ${result.barcode_format || 'PDF417'}</small>
+                    </div>
+                `;
+            } else if (result.license_type === 'SA_DRIVER_LICENSE') {
+                const personal = result.personal_info || {};
+                const license = result.license_info || {};
+                html = `
+                    <h3 style="color: #1f2937; margin-bottom: 20px;">🪪 SA Driver's License (RSA Decrypted)</h3>
+                    <h4 style="margin-top: 20px; color: #667eea;">Personal Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Surname</div>
+                            <div class="info-value">${personal.surname || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Initials</div>
+                            <div class="info-value">${personal.initials || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">ID Number</div>
+                            <div class="info-value">${personal.id_number || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Gender</div>
+                            <div class="info-value">${personal.gender || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Birth Date</div>
+                            <div class="info-value">${personal.birth_date || 'N/A'}</div>
+                        </div>
+                    </div>
+                    <h4 style="margin-top: 20px; color: #667eea;">License Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">License Number</div>
+                            <div class="info-value">${license.license_number || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Issue Date</div>
+                            <div class="info-value">${license.license_issue_date || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Expiry Date</div>
+                            <div class="info-value">${license.license_expiry_date || 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Vehicle Codes</div>
+                            <div class="info-value">${(license.vehicle_codes || []).join(', ') || 'N/A'}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultContent.innerHTML = html;
+            document.getElementById('resultSection').style.display = 'block';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = '❌ ' + message;
+            errorDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

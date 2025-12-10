@@ -1,0 +1,9 @@
+Flask==3.0.0
+flask-cors==4.0.0
+pdf417decoder==1.0.8
+opencv-python-headless==4.10.0.84
+Pillow>=11.0.0
+numpy>=2.0.0
+rsa==4.9.1
+cryptography>=46.0.0
+gunicorn==21.2.0
